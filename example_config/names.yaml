@@ -1,0 +1,21 @@
+Clause:
+  email: example@example.com
+  exclude: "Mrs Claus"
+Mrs Claus:
+  email: example2@example.com
+  exclude: Claus
+Rudolph:
+  email: example3@example.com
+  exclude: ""
+Donner:
+  email: example3@example.com
+  exclude: Dasher
+Dasher:
+  email: example3@example.com
+  exclude: Donner
+Dancer:
+  email: example3@example.com
+  exclude: Prancer
+Prancer:
+  email: example3@example.com
+  exclude: Dancer

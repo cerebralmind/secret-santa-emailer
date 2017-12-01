@@ -1,0 +1,30 @@
+Hi $giver,
+
+You Secret Santa Partner is...
+
+
+Listed at the bottom so it won't show up in email previews :)
+
+
+Please get started by creating a public wish list for yourself on Amazon. You should select items around $price_limit or less, provide several options for your secret santa to choose from. Each person will receive one gift valued at approximately $price_limit from their secret santa. You may add items from any site, but with time running out it is probably best to only include Amazon Prime items.
+
+
+After you have created your list check Amazon for the list created by $receiver so you can find them a gift that they want.
+You should choose either one gift valued at $price_limit for them, or several gifts totalling $price_limit. I recommend 1 gift as it is likely to be nicer.
+
+
+Now be sure to keep it a secret! Don't even tell $sig_other, and above all certainly don't tell $receiver.
+
+
+--------------  $receiver --------------
+
+
+
+Merry Christmas,
+
+- Devin
+
+
+P.S. This email selection was generated from a little program I wrote, so I don't even know who your partner is!
+
+        
