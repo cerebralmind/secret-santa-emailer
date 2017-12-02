@@ -83,7 +83,7 @@ def main():
             print("Emailing %s <%s>: HIDDEN" % (name, names[name]['email']))
         email_recipient = args.dry_run_email or names[name]['email']
         if not args.dry_run:
-            santa_email(name, names[name]['email'], selection[name], names[name]['exclude'], config=config)
+            santa_email(name, email_recipient, selection[name], names[name]['exclude'], config=config)
 
 
 if __name__ == '__main__':
