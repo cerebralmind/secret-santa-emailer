@@ -1,10 +1,23 @@
 #!/usr/bin/env python3.6
 import configargparse
+import networkx as nx
 
 from box import Box
 from emailer import santa_email
 from random import randint
 from yaml import load
+
+def create_graph(names, debug=False):
+    graph = nx.DiGraph()
+    graph.add_nodes_from(names.items())
+    for name, value in names.items():
+        inverted = list(set(names.keys()) - set(value['exclude']) - set([name]))
+        edges = [(name, destination) for destination in inverted]
+        graph.add_edges_from(edges)
+    return graph
+
+def graph_select(graph):
+    return graph
 
 def select(names, debug=False):
 
@@ -26,7 +39,7 @@ def select(names, debug=False):
             chosen.add(selected)
     except:
         print('Retrying after exception')
-    #    selections = select(names)
+        selections = select(names)
 
     return selections
 
