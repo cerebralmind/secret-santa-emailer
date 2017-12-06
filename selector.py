@@ -1,5 +1,6 @@
 #!/usr/bin/env python3.6
 import configargparse
+import matplotlib.pyplot as plt
 import networkx as nx
 
 from box import Box
@@ -9,7 +10,6 @@ from random import randint, choice
 from yaml import load
 
 def create_graph(names, debug=False):
-    print(names)
     graph = nx.DiGraph()
     graph.add_nodes_from(names.items())
     for name, value in names.items():
@@ -18,15 +18,22 @@ def create_graph(names, debug=False):
         graph.add_edges_from(edges)
     return graph
 
+def has_valid_isolates(cycle, reference_graph):
+    graph = reference_graph.copy()
+    graph.remove_nodes_from(cycle)
+    isolates = list(nx.isolates(graph))
+    return not bool(isolates)
+     
+
 def graph_select(graph):
     nodes = graph.nodes
     selection_graph = nx.create_empty_copy(graph)
-    selection_graph.add_nodes_from(nodes)
     try:
         while True:
             choices = nx.simple_cycles(graph)
             n = len(nodes)
             filtered_choices = list(filter(lambda x: len(x) != (n - 1) and len(x) != 1, choices))
+            filtered_choices = list(filter(lambda x: has_valid_isolates(x, graph), filtered_choices))
             cycle = choice(filtered_choices)
             print(f'cycle length: {len(cycle)}')
             print(f'cycle: {cycle}')
@@ -34,9 +41,11 @@ def graph_select(graph):
             graph.remove_nodes_from(cycle)
             isolates = list(nx.isolates(selection_graph))
             print(f'isolates: {isolates}')
+            print(f'empty_selection_graph: {selection_graph}')
             if not isolates:
                 break
-    except:
+    except IndexError as e:
+        print(e)
         print('No valid graph found')
     finally:
         return selection_graph
@@ -110,21 +119,27 @@ def main():
     names = load(args.names.read())
 
     names_graph = create_graph(names)
-    print(names_graph)
+    plt.subplot(121)
+    nx.draw_circular(names_graph, with_labels=True, font_weight='bold')
+    print(f'names_graph: {names_graph}')
     selection_graph = graph_select(names_graph)
-    print(selection_graph.edges)
-    #selection = select(names, debug=args.debug)
+    print(f'selection_edges: {selection_graph.edges}')
+    print(f'selection_nodes: {selection_graph.nodes.data()}')
+    plt.subplot(122)
+    nx.draw_networkx(selection_graph, with_labels=True, font_weight='bold')
+    print()
     for edge in selection_graph.edges:
-        pass
-    #    if not names[name]['exclude']:
-    #        names[name]['exclude'] = 'anyone'
-    #    if args.debug:
-    #        print("Emailing %s <%s>: %s" % (name, names[name]['email'], selection[name]))
-    #    else:
-    #        print("Emailing %s <%s>: HIDDEN" % (name, names[name]['email']))
-    #    email_recipient = args.dry_run_email or names[name]['email']
-    #    if not args.dry_run:
-    #        santa_email(name, email_recipient, selection[name], names[name]['exclude'], config=config)
+        (sender, recipient) = edge
+        email = args.dry_run_email or selection_graph.nodes[sender]['email']
+        exclude = ', '.join(selection_graph.nodes[sender]['exclude'] or ['anyone'])
+
+        if args.debug:
+            print(f"Emailing {sender} <{email}>: {recipient}")
+        else:
+            print(f"Emailing {sender} <{email}>: HIDDEN")
+        if not args.dry_run:
+            santa_email(sender, email, recipient, exclude, config=config)
+    plt.show()
 
 
 if __name__ == '__main__':
