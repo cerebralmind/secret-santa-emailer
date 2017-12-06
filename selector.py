@@ -4,10 +4,12 @@ import networkx as nx
 
 from box import Box
 from emailer import santa_email
-from random import randint
+from pathlib import Path
+from random import randint, choice
 from yaml import load
 
 def create_graph(names, debug=False):
+    print(names)
     graph = nx.DiGraph()
     graph.add_nodes_from(names.items())
     for name, value in names.items():
@@ -17,7 +19,27 @@ def create_graph(names, debug=False):
     return graph
 
 def graph_select(graph):
-    return graph
+    nodes = graph.nodes
+    selection_graph = nx.create_empty_copy(graph)
+    selection_graph.add_nodes_from(nodes)
+    try:
+        while True:
+            choices = nx.simple_cycles(graph)
+            n = len(nodes)
+            filtered_choices = list(filter(lambda x: len(x) != (n - 1) and len(x) != 1, choices))
+            cycle = choice(filtered_choices)
+            print(f'cycle length: {len(cycle)}')
+            print(f'cycle: {cycle}')
+            selection_graph.add_cycle(cycle)
+            graph.remove_nodes_from(cycle)
+            isolates = list(nx.isolates(selection_graph))
+            print(f'isolates: {isolates}')
+            if not isolates:
+                break
+    except:
+        print('No valid graph found')
+    finally:
+        return selection_graph
 
 def select(names, debug=False):
 
@@ -45,9 +67,10 @@ def select(names, debug=False):
 
 
 def main():
-    parser = configargparse.ArgParser(description='Send secret Santa emails', default_config_files=['/etc/secret_santa/*.conf', '/Users/dvitone/.secret_santa/*.conf'])
+    secret_santa_config_dir = Path('~/.secret_santa').expanduser()
+    parser = configargparse.ArgParser(description='Send secret Santa emails', default_config_files=['/etc/secret_santa/*.conf', str(secret_santa_config_dir / '*.conf')])
     parser.add_argument('--names', '-n', metavar='NAMES.yaml',
-                               default='~/.secret_santa/names.yaml',
+                               default=str(secret_santa_config_dir / 'names.yaml'),
                                type=configargparse.FileType('r'),
                                help='yaml file containing participant data')
     parser.add_argument('--debug', action='store_true',
@@ -86,17 +109,22 @@ def main():
 
     names = load(args.names.read())
 
-    selection = select(names, debug=args.debug)
-    for name in names.keys():
-        if not names[name]['exclude']:
-            names[name]['exclude'] = 'anyone'
-        if args.debug:
-            print("Emailing %s <%s>: %s" % (name, names[name]['email'], selection[name]))
-        else:
-            print("Emailing %s <%s>: HIDDEN" % (name, names[name]['email']))
-        email_recipient = args.dry_run_email or names[name]['email']
-        if not args.dry_run:
-            santa_email(name, email_recipient, selection[name], names[name]['exclude'], config=config)
+    names_graph = create_graph(names)
+    print(names_graph)
+    selection_graph = graph_select(names_graph)
+    print(selection_graph.edges)
+    #selection = select(names, debug=args.debug)
+    for edge in selection_graph.edges:
+        pass
+    #    if not names[name]['exclude']:
+    #        names[name]['exclude'] = 'anyone'
+    #    if args.debug:
+    #        print("Emailing %s <%s>: %s" % (name, names[name]['email'], selection[name]))
+    #    else:
+    #        print("Emailing %s <%s>: HIDDEN" % (name, names[name]['email']))
+    #    email_recipient = args.dry_run_email or names[name]['email']
+    #    if not args.dry_run:
+    #        santa_email(name, email_recipient, selection[name], names[name]['exclude'], config=config)
 
 
 if __name__ == '__main__':
