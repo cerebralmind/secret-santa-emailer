@@ -35,13 +35,9 @@ def graph_select(graph):
             filtered_choices = list(filter(lambda x: len(x) != (n - 1) and len(x) != 1, choices))
             filtered_choices = list(filter(lambda x: has_valid_isolates(x, graph), filtered_choices))
             cycle = choice(filtered_choices)
-            print(f'cycle length: {len(cycle)}')
-            print(f'cycle: {cycle}')
             selection_graph.add_cycle(cycle)
             graph.remove_nodes_from(cycle)
             isolates = list(nx.isolates(selection_graph))
-            print(f'isolates: {isolates}')
-            print(f'empty_selection_graph: {selection_graph}')
             if not isolates:
                 break
     except IndexError as e:
@@ -49,30 +45,6 @@ def graph_select(graph):
         print('No valid graph found')
     finally:
         return selection_graph
-
-def select(names, debug=False):
-
-    chosen = set([])
-
-    selections = {}
-    try:
-        for name in names.keys():
-            if debug:
-                print("Name: %s" % name)
-            available = list(set(names.keys()) - set([name, names[name]['exclude']]) - chosen)
-            if debug:
-                print("Available: %s" %  ','.join(available))
-            index = randint(0, len(available) - 1)
-            selected = available[index]
-            if debug:
-                print("Selected: %s" % selected)
-            selections[name] = selected
-            chosen.add(selected)
-    except:
-        print('Retrying after exception')
-        selections = select(names)
-
-    return selections
 
 
 def main():
@@ -121,10 +93,7 @@ def main():
     names_graph = create_graph(names)
     plt.subplot(121)
     nx.draw_circular(names_graph, with_labels=True, font_weight='bold')
-    print(f'names_graph: {names_graph}')
     selection_graph = graph_select(names_graph)
-    print(f'selection_edges: {selection_graph.edges}')
-    print(f'selection_nodes: {selection_graph.nodes.data()}')
     plt.subplot(122)
     nx.draw_networkx(selection_graph, with_labels=True, font_weight='bold')
     print()
@@ -139,7 +108,8 @@ def main():
             print(f"Emailing {sender} <{email}>: HIDDEN")
         if not args.dry_run:
             santa_email(sender, email, recipient, exclude, config=config)
-    plt.show()
+    if args.debug:
+        plt.show()
 
 
 if __name__ == '__main__':

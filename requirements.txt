@@ -1,5 +1,6 @@
 Pillow
 configargparse
+matplotlib
 networkx
 python-box
 pyyaml

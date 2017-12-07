@@ -7,6 +7,8 @@ This is still a work in progress. Notes about the current version:
   - Files should be renamed to be more user friendly
 
 ## Setup
+brew tap caskroom/fonts
+brew cask install font-arial
 pip install -r requirements.txt
 cp -r example_config ~/.secret_santa/
 mkdir images
