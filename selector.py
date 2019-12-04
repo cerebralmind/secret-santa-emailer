@@ -1,4 +1,4 @@
-#!/usr/bin/env python3.6
+#!/usr/bin/env python
 import configargparse
 import matplotlib.pyplot as plt
 import networkx as nx
@@ -7,7 +7,7 @@ from box import Box
 from emailer import santa_email
 from pathlib import Path
 from random import randint, choice
-from yaml import load
+from yaml import load, FullLoader
 
 def create_graph(names, debug=False):
     graph = nx.DiGraph()
@@ -23,7 +23,7 @@ def has_valid_isolates(cycle, reference_graph):
     graph.remove_nodes_from(cycle)
     isolates = list(nx.isolates(graph))
     return not bool(isolates)
-     
+
 
 def graph_select(graph):
     nodes = graph.nodes
@@ -35,7 +35,7 @@ def graph_select(graph):
             filtered_choices = list(filter(lambda x: len(x) != (n - 1) and len(x) != 1, choices))
             filtered_choices = list(filter(lambda x: has_valid_isolates(x, graph), filtered_choices))
             cycle = choice(filtered_choices)
-            selection_graph.add_cycle(cycle)
+            nx.add_cycle(selection_graph, cycle)
             graph.remove_nodes_from(cycle)
             isolates = list(nx.isolates(selection_graph))
             if not isolates:
@@ -43,6 +43,9 @@ def graph_select(graph):
     except IndexError as e:
         print(e)
         print('No valid graph found')
+    except Exception as e:
+        print(e)
+        print('Unhandled error')
     finally:
         return selection_graph
 
@@ -71,7 +74,7 @@ def main():
                                default='Arial.TTF',
                                help='Font Name Username')
     parser.add_argument('--font_path', type=str,
-                               default='/opt/homebrew-cask/Caskroom/font-arial/2.82/',
+                               default='/usr/local/Caskroom/font-arial/2.82/',
                                help='Font Path')
 
     args = parser.parse_args()
@@ -88,7 +91,7 @@ def main():
     config['images'] = images
     config = Box(config)
 
-    names = load(args.names.read())
+    names = load(args.names.read(), Loader=FullLoader)
 
     names_graph = create_graph(names)
     plt.subplot(121)
@@ -96,7 +99,6 @@ def main():
     selection_graph = graph_select(names_graph)
     plt.subplot(122)
     nx.draw_networkx(selection_graph, with_labels=True, font_weight='bold')
-    print()
     for edge in selection_graph.edges:
         (sender, recipient) = edge
         email = args.dry_run_email or selection_graph.nodes[sender]['email']
