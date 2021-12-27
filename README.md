@@ -2,7 +2,7 @@
 Secret Santa Emailer
 
 This is still a work in progress. Notes about the current version:
-  - This uses a dumb but effective randomized brute force algorithm
+  - This uses a graph algorithm to choose randomized valid combinations
   - This version has a few requirements which need to be simplified
   - Files should be renamed to be more user friendly
 

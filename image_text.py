@@ -7,13 +7,13 @@ from PIL import Image, ImageDraw, ImageFont
 
 def gen_image(giver, recipient, config):
     image_config = config.images
-    im = Image.open('images/secret_santa.png')
+    im = Image.open('images/secret_santa.jpg')
     draw = ImageDraw.Draw(im)
-    fontsFolder = image_config['font_path']
-    arialFont_small = ImageFont.truetype(image_config['font'], 24)
     arialFont = ImageFont.truetype(image_config['font'], 42)
-    draw.text((75, 350), f"{recipient}'s", fill='green', font=arialFont)
-    draw.text((540, 350), 'Secret Santa', fill='red', font=arialFont)
+    draw.text((100, 150), f"Merry Christmas {giver}!", fill='black', font=arialFont)
+    draw.text((100, 250), f"You are {recipient}'s", fill='green', font=arialFont)
+    draw.text((100, 350), 'Secret Santa!', fill='red', font=arialFont)
+    draw.text((250, 500), 'Ho! Ho! Ho!', fill='black', font=arialFont)
     file_name = '/tmp/%s.png' % giver
     im.save(file_name)
     return file_name
@@ -22,8 +22,8 @@ if __name__ == '__main__':
     names = ['Nicolas', 'Claus', 'Rudolph', 'Dasher', 'Donner', 'Vixen']
     config, credentials, images = {}, {}, {}
 
-    images['font'] = 'RobotoSlab-VariableFont:wght.ttf'
-    images['font_path'] = '/Users/devin.vitone/Library/Fonts/'
+    images['font'] = 'RobotoSlab-VariableFont_wght.ttf'
+    images['font_path'] = '/Users/devinv/Library/Fonts/'
 
     config['images'] = images
 

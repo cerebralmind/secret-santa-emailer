@@ -43,9 +43,11 @@ def graph_select(graph):
     except IndexError as e:
         print(e)
         print('No valid graph found')
+        raise(e)
     except Exception as e:
         print(e)
         print('Unhandled error')
+        raise(e)
     finally:
         return selection_graph
 
@@ -71,7 +73,7 @@ def main():
                                required=True,
                                help='Email Username')
     parser.add_argument('--font', type=str,
-                               default='Arial.TTF',
+                               default='RobotoSlab-VariableFont_wght.ttf',
                                help='Font Name Username')
     parser.add_argument('--font_path', type=str,
                                default='/usr/local/Caskroom/font-arial/2.82/',
